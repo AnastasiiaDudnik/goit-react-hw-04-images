@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { BsSearchHeart } from 'react-icons/bs';
 import toast from 'react-hot-toast';
 import {
@@ -9,50 +9,43 @@ import {
   SearchInput,
 } from './Searchbar.styled';
 
-export class SearchBar extends Component {
-  state = {
-    searchQuerry: '',
+export function SearchBar({ onSubmit }) {
+  const [searchQuerry, setSearchQuerry] = useState('');
+
+  const handleChange = evt => {
+    setSearchQuerry(evt.currentTarget.value.toLowerCase());
   };
 
-  handleChange = evt => {
-    this.setState({ searchQuerry: evt.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = evt => {
-    const { searchQuerry } = this.state;
-
+  const handleSubmit = evt => {
     evt.preventDefault();
 
     if (searchQuerry.trim() === '') {
       return toast.error('Please, enter a word');
     }
 
-    this.props.onSubmit(searchQuerry);
-    this.setState({ searchQuerry: '' });
+    onSubmit(searchQuerry);
+    setSearchQuerry('');
   };
 
-  render() {
-    const { searchQuerry } = this.state;
-    return (
-      <Searchbar>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SearchButton type="submit">
-            <BsSearchHeart />
-            <ButtonLabel>Search</ButtonLabel>
-          </SearchButton>
+  return (
+    <Searchbar>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchButton type="submit">
+          <BsSearchHeart />
+          <ButtonLabel>Search</ButtonLabel>
+        </SearchButton>
 
-          <SearchInput
-            className="input"
-            name="searchQuerry"
-            value={searchQuerry}
-            onChange={this.handleChange}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-          />
-        </SearchForm>
-      </Searchbar>
-    );
-  }
+        <SearchInput
+          className="input"
+          name="searchQuerry"
+          value={searchQuerry}
+          onChange={handleChange}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+        />
+      </SearchForm>
+    </Searchbar>
+  );
 }

@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './Searchbar/Searchbar';
@@ -14,62 +14,75 @@ const Status = {
   REGECTED: 'regected',
 };
 
-export class App extends Component {
-  state = {
-    searchQuerry: '',
-    images: [],
-    error: '',
-    status: Status.IDLE,
-    page: 1,
-  };
+export function App() {
+  const [searchQuerry, setSearchQuerry] = useState('');
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState(Status.IDLE);
+  const [page, setPage] = useState(1);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { searchQuerry, page } = this.state;
-
-    if (prevState.searchQuerry !== searchQuerry || prevState.page !== page) {
-      this.setState({ status: Status.PENDING });
-
-      pixabayApi(searchQuerry.trim(), page)
-        .then(images =>
-          this.setState({
-            images: [...this.state.images, ...images.hits],
-            status: Status.RESOLVED,
-          })
-        )
-
-        .catch(error => this.setState({ error, status: Status.REGECTED }));
+  useEffect(() => {
+    if (!searchQuerry) {
+      return;
     }
 
-    if (prevState.searchQuerry !== searchQuerry) {
-      this.setState({ images: [], page: 1 });
-    }
-  }
+    setStatus(Status.PENDING);
 
-  onFormSubmit = searchQuerry => {
-    this.setState({ searchQuerry });
+    pixabayApi(searchQuerry.trim(), page)
+      .then(images => {
+        setImages(images.hits);
+        setStatus(Status.RESOLVED);
+      })
+
+      .catch(error => {
+        setStatus(Status.REGECTED);
+        setError(error);
+      });
+  }, [page, searchQuerry]);
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { searchQuerry, page } = this.state;
+
+  //   if (prevState.searchQuerry !== searchQuerry || prevState.page !== page) {
+  //     this.setState({ status: Status.PENDING });
+
+  //     pixabayApi(searchQuerry.trim(), page)
+  //       .then(images =>
+  //         this.setState({
+  //           images: [...this.state.images, ...images.hits],
+  //           status: Status.RESOLVED,
+  //         })
+  //       )
+
+  //       .catch(error => this.setState({ error, status: Status.REGECTED }));
+  //   }
+
+  //   if (prevState.searchQuerry !== searchQuerry) {
+  //     this.setState({ images: [], page: 1 });
+  //   }
+  // }
+
+  // const onFormSubmit = searchQuerry => {
+  //   this.setState({ searchQuerry });
+  // };
+
+  const onLoadMore = () => {
+    setPage(prevState => prevState.page + 1);
   };
 
-  onLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
+  return (
+    <Container>
+      <Toaster />
+      <SearchBar onSubmit={setSearchQuerry} />
 
-  render() {
-    const { images, error, status } = this.state;
-
-    return (
-      <Container>
-        <Toaster />
-        <SearchBar onSubmit={this.onFormSubmit} />
-
-        {status === Status.PENDING && <Loader />}
-        {status === Status.RESOLVED && (
-          <>
-            <ImageGallery images={images} />
-            <LoadMoreButton onClick={this.onLoadMore} />
-          </>
-        )}
-        {status === Status.REGECTED && <h1>{error.message}</h1>}
-      </Container>
-    );
-  }
+      {status === Status.PENDING && <Loader />}
+      {status === Status.RESOLVED && (
+        <>
+          <ImageGallery images={images} />
+          <LoadMoreButton onClick={onLoadMore} />
+        </>
+      )}
+      {status === Status.REGECTED && <h1>{error.message}</h1>}
+    </Container>
+  );
 }
