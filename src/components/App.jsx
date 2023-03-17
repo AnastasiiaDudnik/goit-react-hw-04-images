@@ -26,7 +26,7 @@ export class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { searchQuerry, page } = this.state;
 
-    if (prevProps.searchQuerry !== searchQuerry || prevState.page !== page) {
+    if (prevState.searchQuerry !== searchQuerry || prevState.page !== page) {
       this.setState({ status: Status.PENDING });
 
       pixabayApi(searchQuerry.trim(), page)
@@ -40,7 +40,7 @@ export class App extends Component {
         .catch(error => this.setState({ error, status: Status.REGECTED }));
     }
 
-    if (prevProps.searchQuerry !== searchQuerry) {
+    if (prevState.searchQuerry !== searchQuerry) {
       this.setState({ images: [], page: 1 });
     }
   }
@@ -61,14 +61,14 @@ export class App extends Component {
         <Toaster />
         <SearchBar onSubmit={this.onFormSubmit} />
 
-        {status.PENDING && <Loader />}
-        {status.RESOLVED && (
+        {status === Status.PENDING && <Loader />}
+        {status === Status.RESOLVED && (
           <>
             <ImageGallery images={images} />
             <LoadMoreButton onClick={this.onLoadMore} />
           </>
         )}
-        {status.REGECTED && <h1>{error.message}</h1>}
+        {status === Status.REGECTED && <h1>{error.message}</h1>}
       </Container>
     );
   }
