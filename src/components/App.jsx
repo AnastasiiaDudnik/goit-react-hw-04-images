@@ -40,32 +40,7 @@ export function App() {
       });
   }, [page, searchQuerry]);
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   const { searchQuerry, page } = this.state;
-
-  //   if (prevState.searchQuerry !== searchQuerry || prevState.page !== page) {
-  //     this.setState({ status: Status.PENDING });
-
-  //     pixabayApi(searchQuerry.trim(), page)
-  //       .then(images =>
-  //         this.setState({
-  //           images: [...this.state.images, ...images.hits],
-  //           status: Status.RESOLVED,
-  //         })
-  //       )
-
-  //       .catch(error => this.setState({ error, status: Status.REGECTED }));
-  //   }
-
-  //   if (prevState.searchQuerry !== searchQuerry) {
-  //     this.setState({ images: [], page: 1 });
-  //   }
-  // }
-
-  // const onFormSubmit = searchQuerry => {
-  //   this.setState({ searchQuerry });
-  // };
-
+  
   const onLoadMore = () => {
     setPage(prevState => prevState.page + 1);
   };
