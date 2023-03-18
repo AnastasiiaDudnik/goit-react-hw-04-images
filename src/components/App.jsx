@@ -7,18 +7,19 @@ import { pixabayApi } from 'services/pixabayAPI';
 import { LoadMoreButton } from './Button/LoadMoreButton';
 import { Loader } from './Loader/Loader';
 
-const Status = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  RESOLVED: 'resolved',
-  REGECTED: 'regected',
-};
+// const Status = {
+//   IDLE: 'idle',
+//   PENDING: 'pending',
+//   RESOLVED: 'resolved',
+//   REGECTED: 'regected',
+// };
 
 export function App() {
   const [searchQuerry, setSearchQuerry] = useState('');
   const [images, setImages] = useState([]);
   const [error, setError] = useState('');
-  const [status, setStatus] = useState(Status.IDLE);
+  // const [status, setStatus] = useState(Status.IDLE);
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -26,38 +27,52 @@ export function App() {
       return;
     }
 
-    setStatus(Status.PENDING);
+    // setStatus(Status.PENDING);
+    setIsLoading(true);
 
     pixabayApi(searchQuerry.trim(), page)
       .then(images => {
-        setImages(images.hits);
-        setStatus(Status.RESOLVED);
+        setImages(prevImages => [...prevImages, ...images.hits]);
+        // setStatus(Status.RESOLVED);
+        setIsLoading(false);
       })
 
       .catch(error => {
-        setStatus(Status.REGECTED);
+        // setStatus(Status.REGECTED);
         setError(error);
       });
   }, [page, searchQuerry]);
 
-  
+  const onQueryChange = query => {
+    setSearchQuerry(query);
+    setPage(1);
+    setImages([]);
+    setError('');
+  };
+
   const onLoadMore = () => {
-    setPage(prevState => prevState.page + 1);
+    setPage(prevPage => prevPage + 1);
   };
 
   return (
     <Container>
       <Toaster />
-      <SearchBar onSubmit={setSearchQuerry} />
+      <SearchBar onSubmit={onQueryChange} />
+      <ImageGallery images={images} />
 
-      {status === Status.PENDING && <Loader />}
-      {status === Status.RESOLVED && (
-        <>
-          <ImageGallery images={images} />
-          <LoadMoreButton onClick={onLoadMore} />
-        </>
+      {isLoading && <Loader />}
+
+      {images.length !== 0 && !isLoading && (
+        <LoadMoreButton onClick={onLoadMore} />
       )}
-      {status === Status.REGECTED && <h1>{error.message}</h1>}
+
+      {error && <h1>{error.message}</h1>}
+
+      {/* {status === Status.PENDING && <Loader />} */}
+
+      {/* {status === Status.RESOLVED &&
+        status !== Status.PENDING(<LoadMoreButton onClick={onLoadMore} />)} */}
+      {/* {status === Status.REGECTED && <h1>{error.message}</h1>} */}
     </Container>
   );
 }
