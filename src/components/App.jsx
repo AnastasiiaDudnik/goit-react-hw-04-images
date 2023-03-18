@@ -76,3 +76,67 @@ export function App() {
     </Container>
   );
 }
+
+// import axios from 'axios';
+
+// export function App() {
+//   const [searchQuerry, setSearchQuerry] = useState('');
+//   const [images, setImages] = useState([]);
+//   const [error, setError] = useState('');
+//   // const [status, setStatus] = useState(Status.IDLE);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [page, setPage] = useState(1);
+
+//   useEffect(() => {
+//     if (!searchQuerry) {
+//       return;
+//     }
+
+//     async function fetchCards(searchQuerry, page) {
+//       try {
+//         const BASE_URL = 'https://pixabay.com/api/';
+//         const API_KEY = '33112216-e5b097e9371d0df4b0ecc7612';
+//         const searchOptions =
+//           'image_type=photo&orientation=horizontal&per_page=12';
+
+//         const response = await axios.get(
+//           `${BASE_URL}?key=${API_KEY}&q=${searchQuerry}&${searchOptions}&page=${page}`
+//         );
+
+//         setImages(prevImages => [...prevImages, ...response.data.hits]);
+//         setIsLoading(false);
+//       } catch (error) {
+//         setError(error);
+//       }
+//     }
+//     setIsLoading(true);
+//     fetchCards(searchQuerry, page);
+//   }, [page, searchQuerry]);
+
+//   const onQueryChange = query => {
+//     setSearchQuerry(query);
+//     setPage(1);
+//     setImages([]);
+//     setError('');
+//   };
+
+//   const onLoadMore = () => {
+//     setPage(prevPage => prevPage + 1);
+//   };
+
+//   return (
+//     <Container>
+//       <Toaster />
+//       <SearchBar onSubmit={onQueryChange} />
+//       <ImageGallery images={images} />
+
+//       {isLoading && <Loader />}
+
+//       {images.length !== 0 && !isLoading && (
+//         <LoadMoreButton onClick={onLoadMore} />
+//       )}
+
+//       {error && <h1>{error.message}</h1>}
+//     </Container>
+//   );
+// }
